@@ -1,10 +1,10 @@
 # Web Shell Analyzer
-Web shell analyzer is a cross platform stand-alone binary built solely for the purpose of identifying, decoding and tagging that are suspected to be web shells. The web shell analyzer is the bigger brother to the web shell scanner project (http://github.com/tstillz/webshell-scan),
+Web shell analyzer is a cross platform stand-alone binary built solely for the purpose of identifying, decoding, and tagging files that are suspected to be web shells. The web shell analyzer is the bigger brother to the web shell scanner project (http://github.com/tstillz/webshell-scan),
 which only scans files via regex, no decoding or attribute analysis. 
 
 ### Disclaimer
 The regex and its built-in decoding routines supplied with the scanner are not guaranteed to find every web shell on disk and maybe identify some false positives. It's also recommended you test the analyzer and assess its impact before running on production systems.
-The analyser has no warranty, use as your own risk.
+The analyzer has no warranty, use as your own risk.
 
 ### Features
 
