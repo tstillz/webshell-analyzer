@@ -20,8 +20,8 @@ The analyzer has no warranty, use as your own risk.
 - System Info
 - Tested against the web shell repo: https://github.com/tennc/webshell
  
-#### PRE/POST Decode Actions
-Every file that is scanned is checked for matches in 4 different ways:
+#### PRE/POST Actions
+Every file that is scanned can be run through PRE and/or POST action:
 - PRE-Decoding: Functions invoked BEFORE matching is performed, such as base64 decoding or string replacement.
 - POST-Decoding: Functions invoked AFTER matching is performed, such as url defanging.
 
