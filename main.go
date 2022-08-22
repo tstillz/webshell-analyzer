@@ -1,8 +1,6 @@
 package main
 
 import (
-	cm "./common"
-	ft "./timestamps"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -13,6 +11,8 @@ import (
 	"regexp"
 	"sync"
 	"time"
+	cm "webshell-analyzer/common"
+	ft "webshell-analyzer/timestamps"
 )
 
 func Scan_worker(wg *sync.WaitGroup, rawContents bool) {
