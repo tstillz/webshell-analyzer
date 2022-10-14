@@ -1,8 +1,6 @@
 package main
 
 import (
-	cm "./common"
-	ft "./timestamps"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -13,7 +11,26 @@ import (
 	"regexp"
 	"sync"
 	"time"
+
+	cm "./common"
+	ft "./timestamps"
 )
+
+// Defines extensions
+var (
+	extensionsToLookAt = []string{".php", ".htm", ".asp", ".css", ".html", ".khtml", ".aspx", ".jsp", ".net", ".py", ".cgi", ".pl"}
+)
+
+// funcation to loop extenionstolookat
+
+func checkFileExtension(extensionsToLookAt []string, ext string) bool {
+	for _, fileExtension := range extensionsToLookAt {
+		if fileExtension == ext {
+			return true
+		}
+	}
+	return false
+}
 
 func Scan_worker(wg *sync.WaitGroup, rawContents bool) {
 	for j := range cm.FilesToScan {
@@ -424,10 +441,20 @@ func main() {
 		if err != nil {
 			return err
 		}
-		if !f.IsDir() {
-			if f.Size() < (*size * 1024 * 1024) {
-				cm.FilesToScan <- path
-				totalFilesScanned = totalFilesScanned + 1
+
+		// Checks to make sure its a regular file
+		if !f.Mode().IsRegular() {
+			return nil
+		}
+
+		// calls contains funcation to check extension
+		if checkFileExtension(extensionsToLookAt, filepath.Ext(path)) {
+			if !f.IsDir() {
+				if f.Size() < (*size * 1024 * 1024) {
+					cm.FilesToScan <- path
+					totalFilesScanned = totalFilesScanned + 1
+
+				}
 			}
 		}
 		return nil
