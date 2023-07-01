@@ -1,8 +1,6 @@
 package main
 
 import (
-	cm "./common"
-	ft "./timestamps"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -13,6 +11,8 @@ import (
 	"regexp"
 	"sync"
 	"time"
+	cm "webshell-analyzer/common"
+	ft "webshell-analyzer/timestamps"
 )
 
 func Scan_worker(wg *sync.WaitGroup, rawContents bool) {
@@ -69,7 +69,7 @@ func Scan_worker(wg *sync.WaitGroup, rawContents bool) {
 		}
 
 		// PROD
-		data, err := json.Marshal(Jdata)
+		data, err := json.MarshalIndent(Jdata, "", "  ")
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -333,7 +333,7 @@ func init() {
 		{
 			Name:        "ASP_Execution",
 			Description: "ASP functions associated with code execution",
-			Regex:       *regexp.MustCompile(`(?i)(?:e["+/*-]+v["+/*-]+a["+/*-]+l["+/*-]+\(|system\.diagnostics\.processstartinfo\(\w+\.substring\(|startinfo\.filename=\"?'?cmd\.exe"?'?|\seval\(request\.item\["?'?\w+"?'?\](?:,"?'?unsafe"?'?)?|execute(?:\(|\s+request\(\"\w+\"\))|RunCMD\(|\seval\(|COM\('?"?WScript\.(?:shell|network)"?'?|response\.write\()`),
+			Regex:       *regexp.MustCompile(`(?i)(?:e["+/*-]+v["+/*-]+a["+/*-]+l["+/*-]+\(|system\.diagnostics\.processstartinfo\(\w+\.substring\(|startinfo\.filename=\"?'?cmd\.exe"?'?|\seval\(request\.item\["?'?\w+"?'?\](?:,"?'?unsafe"?'?)?|execute(?:\(|\s+request\(\"\w+\"\))|RunCMD\(|eval\(|COM\('?"?WScript\.(?:shell|network)"?'?|response\.write\()`),
 		},
 		{
 			Name:        "Database_Command_Execution",
@@ -455,7 +455,7 @@ func main() {
 	metrics.SystemInfo.RealName = theUser.Name
 	metrics.SystemInfo.UserHomeDir = theUser.HomeDir
 
-	data, err := json.Marshal(metrics)
+	data, err := json.MarshalIndent(metrics, "", "  ")
 	if err != nil {
 		log.Fatal(err)
 	}

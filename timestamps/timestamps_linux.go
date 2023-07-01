@@ -1,10 +1,10 @@
 package timestamps
 
 import (
-	cm "../common"
 	"os"
 	"syscall"
 	"time"
+	cm "webshell-analyzer/common"
 )
 
 func StatTimes(filePath string) (wts cm.FileTimes, err error) {
