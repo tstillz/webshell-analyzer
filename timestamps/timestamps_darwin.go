@@ -1,7 +1,7 @@
 package timestamps
 
 import (
-	cm "../common"
+	cm "webshell-analyzer/common"
 	"os"
 	"syscall"
 	"time"

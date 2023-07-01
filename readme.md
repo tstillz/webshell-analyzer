@@ -141,15 +141,17 @@ Running `wsa` with no arguments shows the following options:
 
 	/Users/beastmode$ ./wsa
 	Options:
-	    -dir string
-          	Directory to scan for web shells
-        -raw_contents
-          	If a match is found, grab the raw contents and base64 + gzip compress the file into the JSON object.
-        -size int
-          	Specify max file size to scan (default is 10 MB) (default 10)
-        -verbose bool
-            If set to true, the analyzer will print all files analyzer, not just matches
-            
+	      -dir string
+               Directory to scan for web shells
+         -pretty
+               If set to true, the analyzer will output the results in a json indented form
+         -raw_contents
+               If a match is found, grab the raw contents and base64 + gzip compress the file into the JSON object.
+         -size int
+               Specify max file size to scan (default is 10 MB) (default 10)
+         -verbose
+               If set to true, the analyzer will print all files analyzer, not just matches
+
 The only required argument is `dir`. You can override the other program defaults if you wish. 
 	
 The output of the analyser will be written to console (standard output). Example below (For best results, send stdout to a json file and review/post process offline):
@@ -163,19 +165,3 @@ The output of the analyser will be written to console (standard output). Example
 Once the analyzer finishes, it will output the overall scan metrics to STDOUT, as shown in the example below:
 
    `{"scanned":311,"matches":122,"noMatches":189,"directory":"/webshell-master/php","scanDuration":1.4757737378333333,"systemInfo":{"hostname":"Beast","envVars":[""],"username":"beastmode","userID":"501","realName":"The Beast","userHomeDir":"/Users/beastmode"}}`
-
-### Building the project from source
-If you decide to modify the source code, you can build the project using the following commands:
-
-    cd <path-to-project>
-    
-    ## Windows
-    GOOS=windows GOARCH=386 go build -o wsa32.exe main.go
-    GOOS=windows GOARCH=amd64 go build -o wsa64.exe main.go
-    
-    ## Linux
-    GOOS=linux GOARCH=amd64 go build -o wsa_linux64 main.go
-    
-    ## Darwin
-    GOOS=darwin GOARCH=amd64 go build -o wsa_darwin64 main.go
-

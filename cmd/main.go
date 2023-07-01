@@ -11,9 +11,26 @@ import (
 	"regexp"
 	"sync"
 	"time"
+
 	cm "webshell-analyzer/common"
 	ft "webshell-analyzer/timestamps"
 )
+
+// Defines extensions
+var (
+	extensionsToLookAt = []string{".php", ".htm", ".asp", ".css", ".html", ".khtml", ".aspx", ".jsp", ".net", ".py", ".cgi", ".pl"}
+)
+
+// funcation to loop extenionstolookat
+
+func checkFileExtension(extensionsToLookAt []string, ext string) bool {
+	for _, fileExtension := range extensionsToLookAt {
+		if fileExtension == ext {
+			return true
+		}
+	}
+	return false
+}
 
 func Scan_worker(wg *sync.WaitGroup, rawContents bool) {
 	for j := range cm.FilesToScan {
@@ -69,7 +86,7 @@ func Scan_worker(wg *sync.WaitGroup, rawContents bool) {
 		}
 
 		// PROD
-		data, err := json.MarshalIndent(Jdata, "", "  ")
+		data, err := json.Marshal(Jdata)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -333,7 +350,7 @@ func init() {
 		{
 			Name:        "ASP_Execution",
 			Description: "ASP functions associated with code execution",
-			Regex:       *regexp.MustCompile(`(?i)(?:e["+/*-]+v["+/*-]+a["+/*-]+l["+/*-]+\(|system\.diagnostics\.processstartinfo\(\w+\.substring\(|startinfo\.filename=\"?'?cmd\.exe"?'?|\seval\(request\.item\["?'?\w+"?'?\](?:,"?'?unsafe"?'?)?|execute(?:\(|\s+request\(\"\w+\"\))|RunCMD\(|eval\(|COM\('?"?WScript\.(?:shell|network)"?'?|response\.write\()`),
+			Regex:       *regexp.MustCompile(`(?i)(?:e["+/*-]+v["+/*-]+a["+/*-]+l["+/*-]+\(|system\.diagnostics\.processstartinfo\(\w+\.substring\(|startinfo\.filename=\"?'?cmd\.exe"?'?|\seval\(request\.item\["?'?\w+"?'?\](?:,"?'?unsafe"?'?)?|execute(?:\(|\s+request\(\"\w+\"\))|RunCMD\(|\seval\(|COM\('?"?WScript\.(?:shell|network)"?'?|response\.write\()`),
 		},
 		{
 			Name:        "Database_Command_Execution",
@@ -402,6 +419,7 @@ func main() {
 	var dir = flag.String("dir", "", "Directory to scan for web shells")
 	var size = flag.Int64("size", 10, "Specify max file size to scan (default is 10 MB)")
 	var verbose = flag.Bool("verbose", false, "If set to true, the analyzer will print all files analyzer, not just matches")
+	var pretty = flag.Bool("pretty", false, "If set to true, the analyzer will output the results in a json indented form")
 	var rawContents = flag.Bool("raw_contents", false, "If a match is found, grab the raw contents and base64 + gzip compress the file into the JSON object.")
 	flag.Parse()
 
@@ -424,10 +442,20 @@ func main() {
 		if err != nil {
 			return err
 		}
-		if !f.IsDir() {
-			if f.Size() < (*size * 1024 * 1024) {
-				cm.FilesToScan <- path
-				totalFilesScanned = totalFilesScanned + 1
+
+		// Checks to make sure its a regular file
+		if !f.Mode().IsRegular() {
+			return nil
+		}
+
+		// calls contains funcation to check extension
+		if checkFileExtension(extensionsToLookAt, filepath.Ext(path)) {
+			if !f.IsDir() {
+				if f.Size() < (*size * 1024 * 1024) {
+					cm.FilesToScan <- path
+					totalFilesScanned = totalFilesScanned + 1
+
+				}
 			}
 		}
 		return nil
@@ -455,9 +483,18 @@ func main() {
 	metrics.SystemInfo.RealName = theUser.Name
 	metrics.SystemInfo.UserHomeDir = theUser.HomeDir
 
-	data, err := json.MarshalIndent(metrics, "", "  ")
-	if err != nil {
-		log.Fatal(err)
+	if *pretty {
+		data, err := json.MarshalIndent(metrics, "", " ")
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("%s\n", data)
+
+	} else {
+		data, err := json.Marshal(metrics)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("%s\n", data)
 	}
-	fmt.Printf("%s\n", data)
 }
